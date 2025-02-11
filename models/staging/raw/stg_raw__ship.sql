@@ -1,22 +1,21 @@
-with 
-
-source as (
-
-    select * from {{ source('raw', 'ship') }}
-
+WITH source AS (
+    SELECT * FROM {{ source('raw', 'ship') }}
 ),
 
-renamed as (
+filtered AS (
+    -- Vérification des différences entre shipping_fee et shipping_fee_1
+    SELECT *
+    FROM source
+    WHERE shipping_fee <> shipping_fee_1
+),
 
-    select
+renamed AS (
+    SELECT
         orders_id,
-        shipping_fee,
-        shipping_fee_1,
+        shipping_fee,  -- Supposons que cette colonne est correcte après vérification
         logcost,
-        ship_cost
-
-    from source
-
+        CAST(ship_cost AS FLOAT64) AS ship_cost  -- Conversion en FLOAT64
+    FROM source
 )
 
-select * from renamed
+SELECT * FROM renamed
